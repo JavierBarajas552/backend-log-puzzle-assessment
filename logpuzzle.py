@@ -26,8 +26,21 @@ def read_urls(filename):
     extracting the hostname from the filename itself, sorting
     alphabetically in increasing order, and screening out duplicates.
     """
-    # +++your code here+++
-    pass
+    urls = []
+    with open(filename) as f:
+        lines = f.read().split('\n')
+    for line in lines:
+        match = re.search(r' \S+/puzzle/\S+ ', line)
+        if match:
+            if (match.group().strip()) not in urls:
+                urls.append(match.group().strip())
+    urls = map(lambda x: 'http://code.google.com' + x, urls)
+    return sorted(urls, key=sort_key)
+
+
+def sort_key(item):
+    match = re.search(r'-\w+.jpg', item)
+    return match.group()
 
 
 def download_images(img_urls, dest_dir):
@@ -38,7 +51,16 @@ def download_images(img_urls, dest_dir):
     to show each local image file.
     Creates the directory if necessary.
     """
-    # +++your code here+++
+    if not os.path.exists(dest_dir):
+        os.makedirs(dest_dir)
+    with open(dest_dir + '/index.html', 'w') as f:
+        for url in img_urls:
+            f.write('<img src="' + url + '">')
+    print('Retrieving...')
+    for url in img_urls:
+        urllib.request.urlretrieve(
+            url=url, filename=(dest_dir + '/img'+str(img_urls.index(url))))
+    print('Done!')
     pass
 
 
